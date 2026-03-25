@@ -1,60 +1,128 @@
-<section class="dashboard">
-  <section class="hero">
-    <div>
-      <span class="eyebrow">Saldo disponible</span>
-      <h2>{{ user.balance | currency:'COP':'symbol':'1.0-0' }}</h2>
-      <p class="hero__text">
-        Usuario base de la prueba técnica. En el siguiente bloque conectamos la lógica de
-        suscripción, cancelación, historial y notificación.
-      </p>
-    </div>
+@if (vm$ | async; as vm) {
+  <section class="dashboard">
+    @if (vm.error) {
+      <section class="feedback feedback--error">
+        <div>
+          <strong>Error al cargar la información</strong>
+          <p>{{ vm.error }}</p>
+        </div>
 
-    <div class="hero__badges">
-      <span class="pill">5 fondos disponibles</span>
-      <span class="pill pill--soft">Angular Standalone</span>
-    </div>
-  </section>
+        <button type="button" class="feedback__action" (click)="reload()">
+          Reintentar
+        </button>
+      </section>
+    }
 
-  <section class="catalog">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">Fondos BTG</span>
-        <h3>Catálogo inicial de fondos</h3>
-      </div>
-
-      <p>
-        Ya dejamos el dominio tipado y la vista preparada para conectar el mock REST en el
-        siguiente paso.
-      </p>
-    </div>
-
-    <div class="fund-grid">
-      @for (fund of funds; track fund.id) {
-        <article class="fund-card">
-          <div class="fund-card__top">
-            <span
-              class="tag"
-              [class.tag--fpv]="fund.category === 'FPV'"
-              [class.tag--fic]="fund.category === 'FIC'"
-            >
-              {{ fund.category }}
-            </span>
-
-            <span class="fund-card__id">#{{ fund.id }}</span>
-          </div>
-
-          <h4>{{ fund.name }}</h4>
-
-          <p class="fund-card__amount">
-            Monto mínimo:
-            <strong>{{ fund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
-          </p>
-
-          <button type="button" class="fund-card__action" disabled>
-            Suscribir
-          </button>
+    @if (vm.loading) {
+      <section class="skeleton-grid" aria-label="Cargando información">
+        <article class="skeleton-card skeleton-card--large"></article>
+        <article class="skeleton-card"></article>
+        <article class="skeleton-card"></article>
+        <article class="skeleton-card"></article>
+      </section>
+    } @else {
+      <section class="summary">
+        <article class="summary__balance">
+          <span class="section-label">Saldo disponible</span>
+          <h2>{{ (vm.user?.balance ?? 0) | currency:'COP':'symbol':'1.0-0' }}</h2>
+          <p>{{ vm.user?.fullName }}</p>
         </article>
-      }
-    </div>
+
+        <article class="summary__metric">
+          <span>Fondos disponibles</span>
+          <strong>{{ vm.fundCards.length }}</strong>
+        </article>
+
+        <article class="summary__metric">
+          <span>Inversiones activas</span>
+          <strong>{{ vm.activeSubscriptions.length }}</strong>
+        </article>
+
+        <article class="summary__metric">
+          <span>Movimientos</span>
+          <strong>{{ vm.transactions.length }}</strong>
+        </article>
+      </section>
+
+      <section class="catalog">
+        <header class="section-header">
+          <div>
+            <span class="section-label">Fondos</span>
+            <h3>Catálogo disponible</h3>
+          </div>
+        </header>
+
+        <div class="fund-grid">
+          @for (fund of vm.fundCards; track fund.id) {
+            <article class="fund-card">
+              <div class="fund-card__top">
+                <span
+                  class="tag"
+                  [class.tag--fpv]="fund.category === 'FPV'"
+                  [class.tag--fic]="fund.category === 'FIC'"
+                >
+                  {{ fund.category }}
+                </span>
+
+                <span
+                  class="status"
+                  [class.status--active]="fund.hasActiveSubscription"
+                >
+                  {{ fund.hasActiveSubscription ? 'Activo' : 'Disponible' }}
+                </span>
+              </div>
+
+              <h4>{{ fund.name }}</h4>
+
+              <p class="fund-card__amount">
+                Monto mínimo:
+                <strong>{{ fund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
+              </p>
+
+              @if (fund.subscribedAmount) {
+                <p class="fund-card__detail">
+                  Inversión activa:
+                  <strong>{{ fund.subscribedAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
+                </p>
+              } @else {
+                <p class="fund-card__detail">Sin inversión activa</p>
+              }
+            </article>
+          }
+        </div>
+      </section>
+
+      <section class="active-investments">
+        <header class="section-header">
+          <div>
+            <span class="section-label">Resumen</span>
+            <h3>Inversiones activas</h3>
+          </div>
+        </header>
+
+        @if (!vm.activeSubscriptions.length) {
+          <section class="empty-state">
+            <div class="empty-state__icon">₿</div>
+            <h4>No tienes suscripciones activas</h4>
+            <p>En el siguiente bloque conectamos el formulario de suscripción y cancelación.</p>
+          </section>
+        } @else {
+          <div class="active-list">
+            @for (subscription of vm.activeSubscriptions; track subscription.id) {
+              <article class="active-item">
+                <div>
+                  <h4>{{ subscription.fundName }}</h4>
+                  <p>Monto invertido</p>
+                </div>
+
+                <strong>
+                  {{ subscription.amount | currency:'COP':'symbol':'1.0-0' }}
+                </strong>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
   </section>
-</section>
+}

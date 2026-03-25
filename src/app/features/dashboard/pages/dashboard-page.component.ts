@@ -1,20 +1,31 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
-
+import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import {
-  BTG_FUNDS,
-  DEFAULT_USER,
-} from '../../../core/constants/business.constants';
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
+
+import { PortfolioStoreService } from '../../funds/services/portfolio-store.service';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [AsyncPipe, CurrencyPipe],
   templateUrl: './dashboard-page.component.html',
   styleUrl: './dashboard-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPageComponent {
-  readonly user = DEFAULT_USER;
-  readonly funds = BTG_FUNDS;
+export class DashboardPageComponent implements OnInit {
+  private readonly portfolioStoreService = inject(PortfolioStoreService);
+
+  readonly vm$ = this.portfolioStoreService.portfolioViewModel$;
+
+  ngOnInit(): void {
+    this.portfolioStoreService.ensureLoaded();
+  }
+
+  reload(): void {
+    this.portfolioStoreService.reload();
+  }
 }
