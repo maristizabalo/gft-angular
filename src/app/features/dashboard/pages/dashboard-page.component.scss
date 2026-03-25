@@ -10,6 +10,7 @@
 .feedback,
 .summary,
 .catalog,
+.action-panel,
 .active-investments,
 .skeleton-card {
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -32,6 +33,11 @@
   background: rgba(127, 29, 29, 0.22);
 }
 
+.feedback--success {
+  border-color: rgba(74, 222, 128, 0.3);
+  background: rgba(21, 128, 61, 0.18);
+}
+
 .feedback strong {
   display: block;
   margin-bottom: 0.35rem;
@@ -39,7 +45,7 @@
 
 .feedback p {
   margin: 0;
-  color: #fecaca;
+  color: #e2e8f0;
 }
 
 .feedback__action {
@@ -50,6 +56,12 @@
   color: #0f172a;
   font-weight: 700;
   cursor: pointer;
+}
+
+.feedback__action--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .summary {
@@ -98,7 +110,14 @@
   font-weight: 700;
 }
 
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 420px);
+  gap: 1.5rem;
+}
+
 .catalog,
+.action-panel,
 .active-investments {
   padding: 1.5rem;
 }
@@ -109,6 +128,10 @@
   gap: 1rem;
   align-items: flex-start;
   margin-bottom: 1.25rem;
+}
+
+.section-header--compact {
+  margin-bottom: 1rem;
 }
 
 .section-header h3 {
@@ -130,6 +153,11 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.fund-card--selected {
+  border-color: rgba(96, 165, 250, 0.45);
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.28) inset;
 }
 
 .fund-card__top {
@@ -177,6 +205,134 @@
 .fund-card__detail {
   margin: 0;
   color: #cbd5e1;
+}
+
+.fund-card__actions {
+  margin-top: auto;
+}
+
+.subscription-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.field__label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.field__control {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.65);
+  color: #f8fafc;
+  border-radius: 16px;
+  padding: 0.95rem 1rem;
+  outline: none;
+}
+
+.field__control:focus {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.field__error {
+  color: #fecaca;
+  font-size: 0.82rem;
+}
+
+.fund-preview {
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: rgba(15, 23, 42, 0.5);
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.fund-preview h4 {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+}
+
+.fund-preview__data {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.fund-preview__data div {
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.fund-preview__data dt {
+  color: #94a3b8;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.fund-preview__data dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.notification-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.notification-group__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.notification-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.55);
+  cursor: pointer;
+}
+
+.button {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.button--danger {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+.button--full {
+  margin-top: 0.25rem;
 }
 
 .empty-state {
@@ -229,17 +385,13 @@
   background: rgba(15, 23, 42, 0.5);
 }
 
-.active-item h4 {
+.active-item__content h4 {
   margin: 0 0 0.35rem;
 }
 
-.active-item p {
+.active-item__content p {
   margin: 0;
   color: #cbd5e1;
-}
-
-.active-item strong {
-  font-size: 1.1rem;
 }
 
 .skeleton-grid {
@@ -268,6 +420,12 @@
   }
 }
 
+@media (max-width: 1100px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 992px) {
   .summary {
     grid-template-columns: 1fr 1fr;
@@ -287,7 +445,8 @@
 }
 
 @media (max-width: 768px) {
-  .feedback {
+  .feedback,
+  .active-item {
     flex-direction: column;
     align-items: stretch;
   }
@@ -296,11 +455,8 @@
     grid-template-columns: 1fr;
   }
 
-  .active-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
+  .fund-preview__data,
+  .notification-group__options,
   .skeleton-grid {
     grid-template-columns: 1fr;
   }

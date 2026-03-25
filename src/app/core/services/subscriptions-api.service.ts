@@ -17,7 +17,9 @@ export class SubscriptionsApiService {
     );
   }
 
-  createSubscription(subscription: Subscription): Observable<Subscription> {
+  createSubscription(
+    subscription: Omit<Subscription, 'id'>,
+  ): Observable<Subscription> {
     return this.http.post<Subscription>(
       `${API_BASE_URL}/${API_ENDPOINTS.subscriptions}`,
       subscription,

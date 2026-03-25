@@ -1,8 +1,8 @@
 import { NotificationMethod } from './common.types';
 
 export interface Subscription {
-  id: number;
-  fundId: number;
+  id: string;
+  fundId: string;
   fundName: string;
   amount: number;
   notificationMethod: NotificationMethod;

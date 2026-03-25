@@ -5,8 +5,8 @@ import {
 } from './common.types';
 
 export interface Transaction {
-  id: number;
-  fundId: number;
+  id: string;
+  fundId: string;
   fundName: string;
   type: TransactionType;
   amount: number;

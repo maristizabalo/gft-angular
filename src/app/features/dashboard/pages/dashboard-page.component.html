@@ -13,6 +13,29 @@
       </section>
     }
 
+    @if (vm.actionFeedback) {
+      <section
+        class="feedback"
+        [class.feedback--success]="vm.actionFeedback.type === 'success'"
+        [class.feedback--error]="vm.actionFeedback.type === 'error'"
+      >
+        <div>
+          <strong>
+            {{ vm.actionFeedback.type === 'success' ? 'Operación exitosa' : 'No fue posible completar la operación' }}
+          </strong>
+          <p>{{ vm.actionFeedback.message }}</p>
+        </div>
+
+        <button
+          type="button"
+          class="feedback__action feedback__action--ghost"
+          (click)="dismissActionFeedback()"
+        >
+          Cerrar
+        </button>
+      </section>
+    }
+
     @if (vm.loading) {
       <section class="skeleton-grid" aria-label="Cargando información">
         <article class="skeleton-card skeleton-card--large"></article>
@@ -44,80 +67,239 @@
         </article>
       </section>
 
-      <section class="catalog">
-        <header class="section-header">
-          <div>
-            <span class="section-label">Fondos</span>
-            <h3>Catálogo disponible</h3>
-          </div>
-        </header>
+      <section class="workspace">
+        <section class="catalog">
+          <header class="section-header">
+            <div>
+              <span class="section-label">Fondos</span>
+              <h3>Catálogo disponible</h3>
+            </div>
+          </header>
 
-        <div class="fund-grid">
-          @for (fund of vm.fundCards; track fund.id) {
-            <article class="fund-card">
-              <div class="fund-card__top">
-                <span
-                  class="tag"
-                  [class.tag--fpv]="fund.category === 'FPV'"
-                  [class.tag--fic]="fund.category === 'FIC'"
-                >
-                  {{ fund.category }}
-                </span>
+          <div class="fund-grid">
+            @for (fund of vm.fundCards; track fund.id) {
+              <article
+                class="fund-card"
+                [class.fund-card--selected]="selectedFund?.id === fund.id"
+              >
+                <div class="fund-card__top">
+                  <span
+                    class="tag"
+                    [class.tag--fpv]="fund.category === 'FPV'"
+                    [class.tag--fic]="fund.category === 'FIC'"
+                  >
+                    {{ fund.category }}
+                  </span>
 
-                <span
-                  class="status"
-                  [class.status--active]="fund.hasActiveSubscription"
-                >
-                  {{ fund.hasActiveSubscription ? 'Activo' : 'Disponible' }}
-                </span>
-              </div>
+                  <span
+                    class="status"
+                    [class.status--active]="fund.hasActiveSubscription"
+                  >
+                    {{ fund.hasActiveSubscription ? 'Activo' : 'Disponible' }}
+                  </span>
+                </div>
 
-              <h4>{{ fund.name }}</h4>
+                <h4>{{ fund.name }}</h4>
 
-              <p class="fund-card__amount">
-                Monto mínimo:
-                <strong>{{ fund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
-              </p>
-
-              @if (fund.subscribedAmount) {
-                <p class="fund-card__detail">
-                  Inversión activa:
-                  <strong>{{ fund.subscribedAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
+                <p class="fund-card__amount">
+                  Monto mínimo:
+                  <strong>{{ fund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
                 </p>
-              } @else {
-                <p class="fund-card__detail">Sin inversión activa</p>
+
+                @if (fund.subscribedAmount) {
+                  <p class="fund-card__detail">
+                    Inversión activa:
+                    <strong>{{ fund.subscribedAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
+                  </p>
+                } @else {
+                  <p class="fund-card__detail">Sin inversión activa</p>
+                }
+
+                <div class="fund-card__actions">
+                  @if (fund.hasActiveSubscription && fund.activeSubscriptionId) {
+                    <button
+                      type="button"
+                      class="button button--danger"
+                      [disabled]="vm.processing"
+                      (click)="cancelSubscription(fund.activeSubscriptionId)"
+                    >
+                      {{ vm.processing ? 'Procesando...' : 'Cancelar' }}
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="button"
+                      [disabled]="vm.processing"
+                      (click)="selectFund(fund)"
+                    >
+                      Seleccionar
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="action-panel">
+          <header class="section-header section-header--compact">
+            <div>
+              <span class="section-label">Suscripción</span>
+              <h3>Registrar inversión</h3>
+            </div>
+          </header>
+
+          <form
+            class="subscription-form"
+            [formGroup]="subscriptionForm"
+            (ngSubmit)="submitSubscription()"
+          >
+            <label class="field">
+              <span class="field__label">Fondo</span>
+              <select class="field__control" formControlName="fundId">
+                <option value="">Selecciona un fondo</option>
+                @for (fund of vm.fundCards; track fund.id) {
+                  <option [value]="fund.id" [disabled]="fund.hasActiveSubscription">
+                    {{ fund.name }}
+                  </option>
+                }
+              </select>
+
+              @if (
+                subscriptionForm.controls.fundId.invalid &&
+                subscriptionForm.controls.fundId.touched
+              ) {
+                <small class="field__error">Debes seleccionar un fondo.</small>
               }
-            </article>
-          }
-        </div>
+            </label>
+
+            @if (selectedFund) {
+              <section class="fund-preview">
+                <div>
+                  <span class="section-label">Fondo seleccionado</span>
+                  <h4>{{ selectedFund.name }}</h4>
+                </div>
+
+                <dl class="fund-preview__data">
+                  <div>
+                    <dt>Monto mínimo</dt>
+                    <dd>{{ selectedFund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</dd>
+                  </div>
+
+                  <div>
+                    <dt>Saldo actual</dt>
+                    <dd>{{ (vm.user?.balance ?? 0) | currency:'COP':'symbol':'1.0-0' }}</dd>
+                  </div>
+                </dl>
+              </section>
+            }
+
+            <label class="field">
+              <span class="field__label">Monto a invertir</span>
+              <input
+                class="field__control"
+                type="number"
+                formControlName="amount"
+                placeholder="Ingresa el monto"
+                [attr.min]="selectedFund?.minimumAmount ?? 1"
+              />
+
+              @if (
+                subscriptionForm.controls.amount.hasError('required') &&
+                subscriptionForm.controls.amount.touched
+              ) {
+                <small class="field__error">Debes ingresar un monto.</small>
+              }
+
+              @if (
+                subscriptionForm.controls.amount.hasError('min') &&
+                subscriptionForm.controls.amount.touched &&
+                selectedFund
+              ) {
+                <small class="field__error">
+                  El monto mínimo para este fondo es
+                  {{ selectedFund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}.
+                </small>
+              }
+
+              @if (
+                vm.user &&
+                subscriptionForm.controls.amount.value > vm.user.balance
+              ) {
+                <small class="field__error">
+                  El monto supera el saldo disponible.
+                </small>
+              }
+            </label>
+
+            <fieldset class="notification-group">
+              <legend class="field__label">Método de notificación</legend>
+
+              <div class="notification-group__options">
+                @for (option of notificationMethodOptions; track option.value) {
+                  <label class="notification-option">
+                    <input
+                      type="radio"
+                      formControlName="notificationMethod"
+                      [value]="option.value"
+                    />
+                    <span>{{ option.label }}</span>
+                  </label>
+                }
+              </div>
+            </fieldset>
+
+            <button
+              type="submit"
+              class="button button--full"
+              [disabled]="
+                vm.processing ||
+                subscriptionForm.invalid ||
+                !selectedFund ||
+                (!!vm.user && subscriptionForm.controls.amount.value > vm.user.balance)
+              "
+            >
+              {{ vm.processing ? 'Procesando...' : 'Confirmar suscripción' }}
+            </button>
+          </form>
+        </section>
       </section>
 
       <section class="active-investments">
         <header class="section-header">
           <div>
-            <span class="section-label">Resumen</span>
-            <h3>Inversiones activas</h3>
+            <span class="section-label">Inversiones activas</span>
+            <h3>Participaciones vigentes</h3>
           </div>
         </header>
 
         @if (!vm.activeSubscriptions.length) {
           <section class="empty-state">
             <div class="empty-state__icon">₿</div>
-            <h4>No tienes suscripciones activas</h4>
-            <p>En el siguiente bloque conectamos el formulario de suscripción y cancelación.</p>
+            <h4>No tienes participaciones activas</h4>
+            <p>Selecciona un fondo y registra una suscripción.</p>
           </section>
         } @else {
           <div class="active-list">
             @for (subscription of vm.activeSubscriptions; track subscription.id) {
               <article class="active-item">
-                <div>
+                <div class="active-item__content">
                   <h4>{{ subscription.fundName }}</h4>
-                  <p>Monto invertido</p>
+                  <p>
+                    {{ subscription.amount | currency:'COP':'symbol':'1.0-0' }}
+                    ·
+                    {{ subscription.notificationMethod === 'email' ? 'Email' : 'SMS' }}
+                  </p>
                 </div>
 
-                <strong>
-                  {{ subscription.amount | currency:'COP':'symbol':'1.0-0' }}
-                </strong>
+                <button
+                  type="button"
+                  class="button button--danger"
+                  [disabled]="vm.processing"
+                  (click)="cancelSubscription(subscription.id)"
+                >
+                  {{ vm.processing ? 'Procesando...' : 'Cancelar' }}
+                </button>
               </article>
             }
           </div>

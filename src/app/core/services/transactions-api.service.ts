@@ -17,7 +17,9 @@ export class TransactionsApiService {
     );
   }
 
-  createTransaction(transaction: Transaction): Observable<Transaction> {
+  createTransaction(
+    transaction: Omit<Transaction, 'id'>,
+  ): Observable<Transaction> {
     return this.http.post<Transaction>(
       `${API_BASE_URL}/${API_ENDPOINTS.transactions}`,
       transaction,
