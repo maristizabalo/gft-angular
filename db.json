@@ -5,7 +5,7 @@
       "fullName": "Cliente BTG",
       "email": "cliente@btgpactual.com",
       "phone": "+573001112233",
-      "balance": 175000
+      "balance": 500000
     }
   ],
   "funds": [
@@ -47,8 +47,8 @@
       "amount": 75000,
       "notificationMethod": "email",
       "createdAt": "2026-03-25T11:13:46.775Z",
-      "active": true,
-      "cancelledAt": null,
+      "active": false,
+      "cancelledAt": "2026-03-25T11:18:55.178Z",
       "id": "z3u2THb_JZ0"
     },
     {
@@ -67,8 +67,8 @@
       "amount": 250000,
       "notificationMethod": "email",
       "createdAt": "2026-03-25T11:14:20.135Z",
-      "active": true,
-      "cancelledAt": null,
+      "active": false,
+      "cancelledAt": "2026-03-25T11:18:56.377Z",
       "id": "TwaiCm03uDs"
     }
   ],
@@ -123,6 +123,30 @@
       "currentBalance": 175000,
       "notificationMethod": "email",
       "id": "VQLi7hkulVc"
+    },
+    {
+      "fundId": "1",
+      "fundName": "FPV_BTG_PACTUAL_RECAUDADORA",
+      "type": "CANCELLATION",
+      "amount": 75000,
+      "status": "SUCCESS",
+      "message": "Cancelación exitosa de FPV_BTG_PACTUAL_RECAUDADORA.",
+      "createdAt": "2026-03-25T11:18:55.178Z",
+      "previousBalance": 175000,
+      "currentBalance": 250000,
+      "id": "4fCystQ3u5o"
+    },
+    {
+      "fundId": "4",
+      "fundName": "FDO-ACCIONES",
+      "type": "CANCELLATION",
+      "amount": 250000,
+      "status": "SUCCESS",
+      "message": "Cancelación exitosa de FDO-ACCIONES.",
+      "createdAt": "2026-03-25T11:18:56.377Z",
+      "previousBalance": 250000,
+      "currentBalance": 500000,
+      "id": "lGVMcm3GfoE"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
