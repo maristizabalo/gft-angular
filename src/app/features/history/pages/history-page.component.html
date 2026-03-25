@@ -1,0 +1,82 @@
+@if (vm$ | async; as vm) {
+  <section class="history">
+    <header class="history__header">
+      <div>
+        <span class="section-label">Historial</span>
+        <h2>Transacciones</h2>
+      </div>
+
+      <div class="summary">
+        <span>Total</span>
+        <strong>{{ vm.transactions.length }}</strong>
+      </div>
+    </header>
+
+    @if (vm.error) {
+      <section class="feedback feedback--error">
+        <div>
+          <strong>Error al cargar la información</strong>
+          <p>{{ vm.error }}</p>
+        </div>
+
+        <button type="button" class="feedback__action" (click)="reload()">
+          Reintentar
+        </button>
+      </section>
+    }
+
+    @if (vm.loading) {
+      <section class="skeleton-list" aria-label="Cargando historial">
+        <article class="skeleton-item"></article>
+        <article class="skeleton-item"></article>
+        <article class="skeleton-item"></article>
+      </section>
+    } @else if (!vm.transactions.length) {
+      <section class="empty-state">
+        <div class="empty-state__icon">↺</div>
+        <h3>No hay movimientos registrados</h3>
+        <p>Las suscripciones y cancelaciones aparecerán aquí.</p>
+      </section>
+    } @else {
+      <section class="history-list">
+        @for (transaction of vm.transactions; track transaction.id) {
+          <article class="history-item">
+            <div class="history-item__main">
+              <div class="history-item__top">
+                <span
+                  class="history-item__type"
+                  [class.history-item__type--subscription]="transaction.type === 'SUBSCRIPTION'"
+                  [class.history-item__type--cancellation]="transaction.type === 'CANCELLATION'"
+                >
+                  {{ transaction.type === 'SUBSCRIPTION' ? 'Suscripción' : 'Cancelación' }}
+                </span>
+
+                <span class="history-item__date">
+                  {{ transaction.createdAt | date:'medium' }}
+                </span>
+              </div>
+
+              <h3>{{ transaction.fundName }}</h3>
+              <p>{{ transaction.message }}</p>
+
+              @if (transaction.notificationMethod) {
+                <small>
+                  Notificación:
+                  {{ transaction.notificationMethod === 'email' ? 'Email' : 'SMS' }}
+                </small>
+              }
+            </div>
+
+            <div class="history-item__amounts">
+              <strong>{{ transaction.amount | currency:'COP':'symbol':'1.0-0' }}</strong>
+              <span>
+                Saldo:
+                {{ transaction.currentBalance | currency:'COP':'symbol':'1.0-0' }}
+              </span>
+            </div>
+          </article>
+        }
+      </section>
+    }
+  </section>
+}
