@@ -1,0 +1,60 @@
+<section class="dashboard">
+  <section class="hero">
+    <div>
+      <span class="eyebrow">Saldo disponible</span>
+      <h2>{{ user.balance | currency:'COP':'symbol':'1.0-0' }}</h2>
+      <p class="hero__text">
+        Usuario base de la prueba técnica. En el siguiente bloque conectamos la lógica de
+        suscripción, cancelación, historial y notificación.
+      </p>
+    </div>
+
+    <div class="hero__badges">
+      <span class="pill">5 fondos disponibles</span>
+      <span class="pill pill--soft">Angular Standalone</span>
+    </div>
+  </section>
+
+  <section class="catalog">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">Fondos BTG</span>
+        <h3>Catálogo inicial de fondos</h3>
+      </div>
+
+      <p>
+        Ya dejamos el dominio tipado y la vista preparada para conectar el mock REST en el
+        siguiente paso.
+      </p>
+    </div>
+
+    <div class="fund-grid">
+      @for (fund of funds; track fund.id) {
+        <article class="fund-card">
+          <div class="fund-card__top">
+            <span
+              class="tag"
+              [class.tag--fpv]="fund.category === 'FPV'"
+              [class.tag--fic]="fund.category === 'FIC'"
+            >
+              {{ fund.category }}
+            </span>
+
+            <span class="fund-card__id">#{{ fund.id }}</span>
+          </div>
+
+          <h4>{{ fund.name }}</h4>
+
+          <p class="fund-card__amount">
+            Monto mínimo:
+            <strong>{{ fund.minimumAmount | currency:'COP':'symbol':'1.0-0' }}</strong>
+          </p>
+
+          <button type="button" class="fund-card__action" disabled>
+            Suscribir
+          </button>
+        </article>
+      }
+    </div>
+  </section>
+</section>
